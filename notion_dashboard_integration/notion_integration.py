@@ -10,7 +10,7 @@ from scan_pricing_pages import track_pricing_changes  # Function from scan_prici
 
 # Define your Notion API token and database ID
 notion_token = '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'
-database_id = 'your_database_id'
+database_id = '1444973094b380a88451ee5a71e7d340'
 
 # GitHub Personal Access Token and Repository Name (to be passed for monitoring commits)
 github_token = 'your_github_token'  # Replace with your GitHub personal access token
