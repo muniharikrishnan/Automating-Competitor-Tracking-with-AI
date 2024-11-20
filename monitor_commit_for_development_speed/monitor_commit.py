@@ -1,30 +1,24 @@
-
 import requests
 from datetime import datetime, timedelta
 
-# Replace with your token
-TOKEN = "your personal access token here"
-
-# Competitor's GitHub repository (update with the correct repo)
-REPO = 'your repository name' # use your repo name
-
-# GitHub API URL for repository commits
-url = f'https://api.github.com/repos/{REPO}/commits'
-headers = {'Authorization': f'token {TOKEN}'}
-
-# Send a GET request to the API to fetch the last 100 commits
-params = {'per_page': 100}  # You can change this to fetch more or fewer commits if needed
-response = requests.get(url, headers=headers, params=params)
-
-# Check if the request was successful
-if response.status_code == 200:
-    commits = response.json()
-    print(f"Recent Commits for {REPO}:")
+# Function to fetch commits from GitHub
+def get_github_commits(repo, token):
+    url = f'https://api.github.com/repos/{repo}/commits'
+    headers = {'Authorization': f'token {token}'}
+    params = {'per_page': 100}  # You can change this to fetch more or fewer commits if needed
     
-    # Initialize variables to calculate time differences
+    response = requests.get(url, headers=headers, params=params)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Error fetching commits. Status Code: {response.status_code}")
+
+# Function to calculate time differences between commits
+def calculate_commit_frequencies(commits):
     time_differences = []
     commit_dates = []
-
+    
     # Loop through commits to calculate time differences
     for i in range(1, len(commits)):
         latest_commit_date = commits[i-1]['commit']['author']['date']
@@ -39,25 +33,36 @@ if response.status_code == 200:
         
         # Store the date of the commits for later analysis
         commit_dates.append(latest_commit_datetime)
+    
+    return time_differences, commit_dates
 
-    # Calculate average time between commits
+# Function to calculate average time between commits
+def calculate_avg_commit_time(time_differences):
     if time_differences:
         avg_time_diff = sum(time_differences, timedelta()) / len(time_differences)
-        print(f"\nAverage time between commits: {avg_time_diff}")
+        return avg_time_diff
+    return None
 
-    # Calculate commits per week
+# Function to calculate commits per week
+def calculate_commits_per_week(commit_dates):
     if commit_dates:
         start_date = commit_dates[-1]  # Earliest commit date
         end_date = commit_dates[0]     # Latest commit date
         total_weeks = (end_date - start_date).days // 7
         
-        commits_per_week = len(commit_dates) / total_weeks if total_weeks > 0 else len(commit_dates)
-        print(f"\nCommits per week: {commits_per_week:.2f} commits/week")
+        return len(commit_dates) / total_weeks if total_weeks > 0 else len(commit_dates)
+    return 0
 
-    # Print a few time differences to get an idea of commit frequency
-    print("\nTime differences between consecutive commits:")
-    for i, time_diff in enumerate(time_differences[:10]):  # Show first 10 time differences
-        print(f"Commit {i+1} to Commit {i+2}: {time_diff}")
-
-else:
-    print(f"Error: Unable to fetch commits. Status Code: {response.status_code}")
+# Main function to combine all logic
+def monitor_commits(repo, token):
+    commits = get_github_commits(repo, token)
+    
+    time_differences, commit_dates = calculate_commit_frequencies(commits)
+    avg_time_diff = calculate_avg_commit_time(time_differences)
+    commits_per_week = calculate_commits_per_week(commit_dates)
+    
+    return {
+        "avg_time_diff": avg_time_diff,
+        "commits_per_week": commits_per_week,
+        "time_differences": time_differences[:10]  # Show first 10 time differences
+    }
