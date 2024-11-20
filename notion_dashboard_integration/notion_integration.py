@@ -3,14 +3,18 @@ import json
 from datetime import datetime
 
 # Import data-fetching functions from subtask files
-from monitor_commit import get_github_data  # Function from monitor_commit.py
+from monitor_commit import monitor_commits  # Changed function name from get_github_data to monitor_commits
 from job_postings import get_job_posting_data  # Function from job_postings.py
-from app_reviews import analyze_reviews  # Function from app_reviews.py
+from app_reviews import analyze_review_and_sentinment  # Function from app_reviews.py
 from scan_pricing_pages import track_pricing_changes  # Function from scan_pricing_pages.py
 
 # Define your Notion API token and database ID
 notion_token = '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'
 database_id = 'your_database_id'
+
+# GitHub Personal Access Token and Repository Name (to be passed for monitoring commits)
+github_token = 'your_github_token'  # Replace with your GitHub personal access token
+github_repo = 'your_github_repo_name'  # Replace with the GitHub repository name (e.g., 'user/repo')
 
 # Define the Notion API URL
 url = 'https://api.notion.com/v1/pages'
@@ -31,12 +35,11 @@ def synthesize_data(competitor_data, job_posting_data, review_sentiment, pricing
     return brief
 
 # Fetch data from previous subtask functions
-competitor_data = get_github_data()  # Get GitHub data from monitor_commit.py
+competitor_data = monitor_commits(github_repo, github_token)  # Fetch GitHub commit data using monitor_commits function
 job_posting_data = get_job_posting_data()  # Get job posting data from job_postings.py
-review_sentiment = analyze_reviews()  # Get review sentiment analysis from app_reviews.py
+review_sentiment = analyze_reviews_and_sentiment() # Get review sentiment analysis from app_reviews.py
 
 # For pricing changes, use the scan_pricing_pages.py function
-# First, we need to fetch pricing data and track any changes
 previous_data = None  # This would typically be persisted in a database or file
 pricing_info = fetch_pricing_changes()  # Fetch current pricing data
 pricing_changes, updated_data = track_pricing_changes(pricing_info, previous_data)  # Track and identify pricing changes

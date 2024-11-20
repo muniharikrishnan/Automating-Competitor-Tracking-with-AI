@@ -51,7 +51,7 @@ def visualize_weak_points(common_words):
     plt.show()
 
 # --- Main Function ---
-def main():
+def analyse_review_and_sentiment():
     app_id = "com.automatingcompetitortrackingwithai"  # Use the project name as the app ID
     reviews = fetch_reviews(app_id)
 
@@ -69,4 +69,4 @@ def main():
         print("No reviews found or unable to fetch reviews.")
 
 if __name__ == "__main__":
-    main()
+    analyse_review_and_sentiment()

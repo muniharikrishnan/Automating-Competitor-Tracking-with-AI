@@ -165,7 +165,7 @@ def plot_job_trends(job_trends):
 
 
 # --- Main Function to Execute the Tracking ---
-def main():
+def  get_job_posting_data():
     # API keys for Indeed, Glassdoor, ZipRecruiter (replace with actual API keys)
     indeed_api_key = 'your_indeed_api_key'
     glassdoor_api_key = 'your_glassdoor_api_key'
@@ -194,5 +194,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-    
+     get_job_posting_data()
