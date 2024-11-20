@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://competitor.com/product",
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "name": "Competitor Pricing Scraping",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const data = items[0].json.body;\nconst pricing = data.price;\nreturn [{json: {pricing}}];"
+      },
+      "name": "Extract Pricing Data",
+      "type": "n8n-nodes-base.function",
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "sheetId": "YOUR_GOOGLE_SHEET_ID",
+        "range": "A1",
+        "data": "=COMPLETE_SHEET_VALUES"
+      },
+      "name": "Store Pricing Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/repos/competitor/repo/commits",
+        "options": {
+          "responseFormat": "json"
+        }
+      },
+      "name": "Fetch GitHub Commits",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [250, 500]
+    },
+    {
+      "parameters": {
+        "functionCode": "const commits = items[0].json.body;\nconst frequency = commits.length;\nreturn [{json: {commitFrequency: frequency}}];"
+      },
+      "name": "Analyze Commit Frequency",
+      "type": "n8n-nodes-base.function",
+      "position": [500, 500]
+    },
+    {
+      "parameters": {
+        "message": "Today's Market Brief:\nPricing Changes: {{JSON response}}\nJob Posting Trends: {{JSON data}}\nCommit Frequency: {{commitFrequency}}",
+        "channel": "#market-briefs"
+      },
+      "name": "Send Report to Slack",
+      "type": "n8n-nodes-base.slack",
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Competitor Pricing Scraping": {
+      "main": [
+        [
+          {
+            "node": "Extract Pricing Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Pricing Data": {
+      "main": [
+        [
+          {
+            "node": "Store Pricing Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch GitHub Commits": {
+      "main": [
+        [
+          {
+            "node": "Analyze Commit Frequency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Commit Frequency": {
+      "main": [
+        [
+          {
+            "node": "Send Report to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
