@@ -18,5 +18,5 @@ Ensure the following libraries are installed:
 - `wordcloud`
 
 You can install these libraries using `pip`:
-```bash
+
 pip install requests beautifulsoup4 textblob matplotlib wordcloud
